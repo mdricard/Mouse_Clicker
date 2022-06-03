@@ -18,7 +18,8 @@ class MyLabelPixmap(QLabel):
         self.setCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
 
     def mouseMoveEvent(self, event):
-        print("Move ", event.pos().x(), event.pos().y())
+        pass
+        #print("Move ", event.pos().x(), event.pos().y())
 
     def mousePressEvent(self, event):
         self.mx_pts.append(event.pos().x())
@@ -34,9 +35,38 @@ class MyLabelPixmap(QLabel):
         painter.drawPixmap(self.rect(), pixmap)
         pen = QPen(Qt.red, 2)
         painter.setPen(pen)
-        #painter.drawLine(362, 344, 372, 466)
         if self.n_pts == 2:
             painter.drawLine(self.mx_pts[0], self.my_pts[0], self.mx_pts[1], self.my_pts[1])
+            pts = self.midPoints(0.25)
+            painter.drawLine(int(pts[0]), int(pts[1]), int(pts[2]), int(pts[3]))
+            pts = self.midPoints(0.50)
+            painter.drawLine(int(pts[0]), int(pts[1]), int(pts[2]), int(pts[3]))
+            pts = self.midPoints(0.75)
+            painter.drawLine(int(pts[0]), int(pts[1]), int(pts[2]), int(pts[3]))
+
+    def midPoints(self, percent):
+        """
+        https://www.varsitytutors.com/act_math-help/how-to-find-the-equation-of-a-perpendicular-line#:~:text=Perpendicular%20lines%20have%20opposite%2Dreciprocal,%2F2%20%2B%20y%20%3D%206.
+        self.mx_pts[0] = 0.0
+        self.my_pts[0] = 3.0
+        self.mx_pts[1] = 1.0
+        self.my_pts[1] = 2.4
+        """
+        x_percent = self.mx_pts[0] + (percent * (self.mx_pts[1] - self.mx_pts[0]))
+        y_percent = self.my_pts[0] + (percent * (self.my_pts[1] - self.my_pts[0]))
+        # below is the perpendicular slope to pts[0] and pts[1]
+        m = (self.my_pts[1] - self.my_pts[0]) / (self.mx_pts[1] - self.mx_pts[0])
+        slope = -1.0 / m
+        b = (-slope * x_percent) + y_percent
+        #b = (-slope * 3.0) + 2.0
+        x_left = x_percent - 100.0
+        y_left = (slope * x_left) + b
+        x_right = x_percent + 200.0
+        y_right = (slope * x_right) + b
+        #print("slope = ", m)
+        #print("b = ", b)
+        #print("Per Slope: ", slope)
+        return [x_left, y_left, x_right, y_right]
 
 class Window(QWidget):
 
